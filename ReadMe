@@ -1,0 +1,7 @@
+ReadMe
+
+1. /yahoo/yahoo/spiders/yahoo_spider.py is the code of main spider.
+	If you want to change the logic or data you want to collect, you can change code there.
+2. items.py file is like directory in Python, it can be used to store data which we download from the website.
+3. If you want to change the keywords of website, you can change the "keywords = xx+xx+..." at yahoo_spider.py.
+4. If you want to use this crawler, you can open a terminal and enter "scrapy crawl yahoo".

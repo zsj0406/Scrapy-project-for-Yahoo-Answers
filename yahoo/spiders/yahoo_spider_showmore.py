@@ -10,38 +10,36 @@ import json
 class yahooSpider(scrapy.Spider):
     name = "yahoo_showmore"
 
-    keywords = "headache"
+    keywords = "low+back+pain"
     start_urls = [
             "https://answers.yahoo.com/search/search_result?fr=uh3_answers_vert_gs&type=2button&p="+keywords+"&s=1"
             ]
-    # srart_urls = ["https://answers.yahoo.com/question/index?qid=20110713135545AAwsbf6"]
     cookies = None
     
     def parse(self,response):
-        # print response.url
-        # print response
-        # urls = response.xpath('//div[@id="ya-sr-pg"]/a[@class="ya-sr-next"]/@href').extract()
+        global links
+        global link
         links = response.xpath('//h3[@class="question-title"]/a/@href').extract()
-        # item = YahooItem()
         # time.sleep(5)
+
+        item = YahooItem()
+        
         for link in links:
             link = "https://answers.yahoo.com"+link
             yield Request(link,callback = self.parse_answer)
 
+        # next page
         urls = response.xpath('//a[@class="ya-sr-next"]/@href').extract()
         if urls:
             for url in urls:
                 url = "https://answers.yahoo.com/search/" + url
-                # yield YahooItem(url = link[i])
                 yield Request(url,callback = self.parse)
 
     def parse_answer(self,response):
-        # for sel in response.xpath('//ul'):
-            # print response
             # time.sleep(5)
             item = YahooItem()
             titles = response.xpath('//h1[@itemprop="name"]/text()').extract()
-            print titles
+            l1 = response.xpath('//*[@id="Stencil"]/head/link[4]/@href').extract()
             q1 = response.xpath('//span[@class="D-n ya-q-full-text Ol-n"]/text()').extract()           
             if q1:
                 questions = response.xpath('//span[@class="D-n ya-q-full-text Ol-n"]').extract()
@@ -55,9 +53,4 @@ class yahooSpider(scrapy.Spider):
             for i in range(len(titles)):
                 t = lxml.html.fromstring(questions[i])
                 data = t.text_content()
-                print titles[i]
-                yield YahooItem(title = titles[i], ques = data, cate = cates[i])
-
-
-
-
+                yield YahooItem(title = titles[i], ques = data, cate = cates[i], link = l1[i])
